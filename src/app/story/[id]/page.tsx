@@ -2,6 +2,7 @@ import { requireAuth } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import VideoPlayer from '@/components/VideoPlayer';
 
 interface Story {
   id: string;
@@ -64,16 +65,7 @@ export default async function StoryPage({
             <h2 className="mb-4 text-lg font-medium text-zinc-900 dark:text-zinc-50">
               Video
             </h2>
-            <div className="flex aspect-video w-full items-center justify-center rounded-lg border-2 border-dashed border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800">
-              <div className="text-center">
-                <p className="text-zinc-600 dark:text-zinc-400">
-                  Video will appear here
-                </p>
-                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-500">
-                  Key: {story.video_object_key}
-                </p>
-              </div>
-            </div>
+            <VideoPlayer storyId={id} />
           </div>
         </div>
       </main>
