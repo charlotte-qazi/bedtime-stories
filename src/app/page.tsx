@@ -1,21 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { requireAuth } from '@/lib/auth';
 
 export default async function Home() {
-  const supabase = await createClient();
-  
-  let user = null;
-  try {
-    const { data } = await supabase.auth.getUser();
-    user = data.user;
-  } catch (error) {
-    console.error('Auth check failed:', error);
-    redirect('/login');
-  }
-
-  if (!user) {
-    redirect('/login');
-  }
+  const user = await requireAuth();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
