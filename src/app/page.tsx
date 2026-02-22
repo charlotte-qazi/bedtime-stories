@@ -1,13 +1,7 @@
 import { requireAuth } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-
-interface Story {
-  id: string;
-  title: string;
-  reader: 'granny' | 'grandpa';
-  created_at: string;
-}
+import type { Story } from '@/lib/types';
 
 export default async function Home() {
   const user = await requireAuth();
@@ -52,17 +46,6 @@ export default async function Home() {
           <div className="rounded-lg border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
             <p className="text-zinc-600 dark:text-zinc-400">
               No stories yet. Create your first story!
-            </p>
-            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-500">
-              {/* Seed instructions:
-                  Go to Supabase SQL Editor and run:
-                  
-                  INSERT INTO stories (title, reader, video_object_key, created_at)
-                  VALUES 
-                    ('The Magical Forest', 'granny', 'videos/sample1.mp4', NOW()),
-                    ('Adventures in Space', 'grandpa', 'videos/sample2.mp4', NOW() - INTERVAL '1 day'),
-                    ('The Brave Little Mouse', 'granny', 'videos/sample3.mp4', NOW() - INTERVAL '2 days');
-              */}
             </p>
           </div>
         ) : (

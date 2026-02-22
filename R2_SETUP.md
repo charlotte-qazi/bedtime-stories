@@ -1,8 +1,8 @@
 # Cloudflare R2 Setup Guide
 
-## Overview
+## Quick Start
 
-This project uses Cloudflare R2 for video storage. R2 is S3-compatible and requires API tokens for access.
+This project uses Cloudflare R2 for video storage. Follow these steps to get started.
 
 ## Setup Steps
 
@@ -191,85 +191,35 @@ Visit: `http://localhost:3000/api/test-r2`
 
 ## Troubleshooting
 
-### "Missing credentials in config" Error
+### Upload fails with CORS error
+**Solution**: Make sure you completed step 5 (CORS configuration) and waited 1-2 minutes.
 
-**Solution**: Ensure all R2 environment variables are set in `.env.local` and restart dev server.
+### "Missing credentials in config"
+**Solution**: Check all R2 environment variables are in `.env.local` and restart dev server.
 
-### "Access Denied" Error
+### "Access Denied"
+**Solution**: Verify API token permissions and bucket name match exactly.
 
-**Solution**: 
-1. Verify API token has correct permissions
-2. Check bucket name matches exactly
-3. Ensure object key exists in bucket
+### 5. Configure CORS (Required for Upload)
 
-### "SignatureDoesNotMatch" Error
+⚠️ **Required before uploading videos from the browser**
 
-**Solution**: 
-1. Verify `R2_SECRET_ACCESS_KEY` is correct
-2. Ensure no extra spaces in environment variables
-3. Check `R2_ACCOUNT_ID` is correct
+1. Go to your bucket → **Settings** tab → **CORS Policy**
+2. Click **Add CORS policy**
+3. Paste:
+   ```json
+   [
+     {
+       "AllowedOrigins": ["http://localhost:3000"],
+       "AllowedMethods": ["GET", "PUT"],
+       "AllowedHeaders": ["*"],
+       "MaxAgeSeconds": 3600
+     }
+   ]
+   ```
+4. Click **Save** and wait 1-2 minutes
 
-### CORS Configuration (Required for Browser Upload)
-
-⚠️ **You must configure CORS before uploading videos from the browser.**
-
-**Steps:**
-
-1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) → **R2**
-2. Click on your bucket name (e.g., `bedtime-stories`)
-3. Go to **Settings** tab
-4. Scroll down to **CORS Policy**
-5. Click **Add CORS policy** (or **Edit** if one exists)
-6. Paste this configuration:
-
-```json
-[
-  {
-    "AllowedOrigins": [
-      "http://localhost:3000",
-      "http://localhost:3001"
-    ],
-    "AllowedMethods": [
-      "GET",
-      "PUT"
-    ],
-    "AllowedHeaders": [
-      "*"
-    ],
-    "ExposeHeaders": [],
-    "MaxAgeSeconds": 3600
-  }
-]
-```
-
-7. Click **Save**
-
-**For Production:**
-
-When deploying, add your production domain to `AllowedOrigins`:
-
-```json
-[
-  {
-    "AllowedOrigins": [
-      "http://localhost:3000",
-      "https://yourdomain.com",
-      "https://www.yourdomain.com"
-    ],
-    "AllowedMethods": [
-      "GET",
-      "PUT"
-    ],
-    "AllowedHeaders": [
-      "*"
-    ],
-    "ExposeHeaders": [],
-    "MaxAgeSeconds": 3600
-  }
-]
-```
-
-**Note**: After adding CORS policy, wait 1-2 minutes for it to propagate.
+**For production:** Add your production domain to `AllowedOrigins`
 
 ## Next Steps
 

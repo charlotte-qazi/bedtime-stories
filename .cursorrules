@@ -219,8 +219,11 @@ import type { Metadata } from 'next';
 - ✅ Use `type` keyword for type-only imports
 - ✅ Keep type imports separate from value imports
 
-### Component Props
+### Component Props & Shared Types
 ```typescript
+// Use shared types from src/lib/types.ts
+import type { Story } from '@/lib/types';
+
 export default function Component({
   children,
 }: Readonly<{
@@ -231,6 +234,7 @@ export default function Component({
 ```
 
 **Rules:**
+- ✅ Use shared types from `@/lib/types` for domain models (Story, etc.)
 - ✅ Use `Readonly<>` for props that shouldn't be mutated
 - ✅ Explicitly type props inline for simple components
 - ✅ Extract complex props to separate interfaces
@@ -397,10 +401,12 @@ const user = await requireAuth();
 
 ## 📚 Key Files Reference
 
-### Authentication
+### Core Libraries
 - `src/lib/auth.ts` - Auth helpers (requireAuth, requireAuthAPI)
+- `src/lib/types.ts` - Shared TypeScript interfaces
 - `src/lib/supabase/browser.ts` - Browser client creator
 - `src/lib/supabase/server.ts` - Server client creator
+- `src/lib/r2.ts` - R2 presigned URL helpers
 
 ### Pages
 - `src/app/page.tsx` - Protected home page (example)

@@ -3,14 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import VideoPlayer from '@/components/VideoPlayer';
-
-interface Story {
-  id: string;
-  title: string;
-  reader: 'granny' | 'grandpa';
-  video_object_key: string;
-  created_at: string;
-}
+import type { Story } from '@/lib/types';
 
 export default async function StoryPage({
   params,
