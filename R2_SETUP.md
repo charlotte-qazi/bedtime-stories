@@ -209,20 +209,67 @@ Visit: `http://localhost:3000/api/test-r2`
 2. Ensure no extra spaces in environment variables
 3. Check `R2_ACCOUNT_ID` is correct
 
-### CORS Issues (Browser Upload)
+### CORS Configuration (Required for Browser Upload)
 
-If uploading from browser, configure CORS in R2 bucket settings:
+⚠️ **You must configure CORS before uploading videos from the browser.**
 
-1. Go to bucket settings in R2 dashboard
-2. Navigate to **CORS policy**
-3. Add policy:
-   ```json
-   {
-     "AllowedOrigins": ["http://localhost:3000"],
-     "AllowedMethods": ["PUT", "GET"],
-     "AllowedHeaders": ["*"]
-   }
-   ```
+**Steps:**
+
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) → **R2**
+2. Click on your bucket name (e.g., `bedtime-stories`)
+3. Go to **Settings** tab
+4. Scroll down to **CORS Policy**
+5. Click **Add CORS policy** (or **Edit** if one exists)
+6. Paste this configuration:
+
+```json
+[
+  {
+    "AllowedOrigins": [
+      "http://localhost:3000",
+      "http://localhost:3001"
+    ],
+    "AllowedMethods": [
+      "GET",
+      "PUT"
+    ],
+    "AllowedHeaders": [
+      "*"
+    ],
+    "ExposeHeaders": [],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+7. Click **Save**
+
+**For Production:**
+
+When deploying, add your production domain to `AllowedOrigins`:
+
+```json
+[
+  {
+    "AllowedOrigins": [
+      "http://localhost:3000",
+      "https://yourdomain.com",
+      "https://www.yourdomain.com"
+    ],
+    "AllowedMethods": [
+      "GET",
+      "PUT"
+    ],
+    "AllowedHeaders": [
+      "*"
+    ],
+    "ExposeHeaders": [],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+**Note**: After adding CORS policy, wait 1-2 minutes for it to propagate.
 
 ## Next Steps
 

@@ -25,13 +25,21 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
       <main className="mx-auto w-full max-w-3xl p-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-semibold text-zinc-900 dark:text-zinc-50">
-            Stories
-          </h1>
-          <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-            Welcome, {user.email}!
-          </p>
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-semibold text-zinc-900 dark:text-zinc-50">
+              Stories
+            </h1>
+            <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+              Welcome, {user.email}!
+            </p>
+          </div>
+          <Link
+            href="/admin/upload"
+            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          >
+            + Upload Story
+          </Link>
         </div>
 
         {error && (
