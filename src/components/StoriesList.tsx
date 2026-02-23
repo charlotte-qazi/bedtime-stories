@@ -20,13 +20,13 @@ export default function StoriesList({
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero section with ocean illustration */}
-      <div className="relative overflow-hidden bg-blue-950">
+      <div className="relative min-h-[420px] overflow-hidden bg-blue-950 sm:min-h-[460px]">
         <div className="absolute inset-0">
           <Image
             src="/images/ocean-hero.jpg"
             alt=""
             fill
-            className="object-cover object-center lg:object-bottom opacity-40"
+            className="object-cover object-[center_55%] opacity-40"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-b from-blue-950/50 via-transparent to-blue-950/70" />
