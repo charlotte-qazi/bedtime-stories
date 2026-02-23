@@ -106,15 +106,15 @@ export default function UploadForm() {
   }
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="rounded-lg border border-slate-200 bg-white p-8">
       {success && (
-        <div className="mb-6 rounded-md bg-green-50 p-4 dark:bg-green-900/20">
-          <p className="text-sm text-green-800 dark:text-green-400">
+        <div className="mb-6 rounded-md bg-emerald-50 p-4">
+          <p className="text-sm text-emerald-800">
             Story uploaded successfully!
           </p>
           <Link
             href="/"
-            className="mt-2 inline-block text-sm font-medium text-green-900 hover:underline dark:text-green-300"
+            className="mt-2 inline-block text-sm font-medium text-teal-500 hover:underline"
           >
             ← View all stories
           </Link>
@@ -122,7 +122,7 @@ export default function UploadForm() {
       )}
 
       {error && (
-        <div className="mb-6 rounded-md bg-red-50 p-3 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-400">
+        <div className="mb-6 rounded-md bg-red-50 p-3 text-sm text-red-800">
           {error}
         </div>
       )}
@@ -131,7 +131,7 @@ export default function UploadForm() {
         <div>
           <label
             htmlFor="title"
-            className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            className="block text-sm font-medium text-slate-700"
           >
             Story Title
           </label>
@@ -141,7 +141,7 @@ export default function UploadForm() {
             type="text"
             required
             disabled={uploading}
-            className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
+            className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-blue-950 focus:outline-none focus:ring-1 focus:ring-blue-950 disabled:opacity-50"
             placeholder="The Magical Forest"
           />
         </div>
@@ -149,7 +149,7 @@ export default function UploadForm() {
         <div>
           <label
             htmlFor="reader"
-            className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            className="block text-sm font-medium text-slate-700"
           >
             Reader
           </label>
@@ -158,7 +158,7 @@ export default function UploadForm() {
             name="reader"
             required
             disabled={uploading}
-            className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-950 focus:outline-none focus:ring-1 focus:ring-blue-950 disabled:opacity-50"
           >
             <option value="">Select reader</option>
             <option value="granny">👵 Granny</option>
@@ -169,7 +169,7 @@ export default function UploadForm() {
         <div>
           <label
             htmlFor="video"
-            className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            className="block text-sm font-medium text-slate-700"
           >
             Video File
           </label>
@@ -180,15 +180,15 @@ export default function UploadForm() {
             accept="video/*"
             required
             disabled={uploading}
-            className="mt-1 block w-full text-sm text-zinc-900 file:mr-4 file:rounded-md file:border-0 file:bg-zinc-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-zinc-900 hover:file:bg-zinc-200 disabled:opacity-50 dark:text-zinc-100 dark:file:bg-zinc-800 dark:file:text-zinc-100 dark:hover:file:bg-zinc-700"
+            className="mt-1 block w-full text-sm text-slate-900 file:mr-4 file:rounded-md file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-slate-900 hover:file:bg-slate-200 disabled:opacity-50"
           />
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-500">
+          <p className="mt-1 text-sm text-slate-500">
             MP4, MOV, or other video formats
           </p>
         </div>
 
         {progress && (
-          <div className="rounded-md bg-blue-50 p-3 text-sm text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+          <div className="rounded-md bg-blue-50 p-3 text-sm text-blue-800">
             {progress}
           </div>
         )}
@@ -197,13 +197,13 @@ export default function UploadForm() {
           <button
             type="submit"
             disabled={uploading}
-            className="flex-1 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="flex-1 rounded-md bg-blue-950 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-900 disabled:opacity-50"
           >
             {uploading ? 'Uploading...' : 'Upload Story'}
           </button>
           <Link
             href="/"
-            className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
           >
             Cancel
           </Link>

@@ -37,24 +37,24 @@ export default function VideoPlayer({ storyId }: VideoPlayerProps) {
 
   if (loading) {
     return (
-      <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
-        <p className="text-zinc-600 dark:text-zinc-400">Loading video...</p>
+      <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-slate-100">
+        <p className="text-slate-600">Loading video...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex aspect-video w-full items-center justify-center rounded-lg border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-900/20">
-        <p className="text-red-800 dark:text-red-400">{error}</p>
+      <div className="flex aspect-video w-full items-center justify-center rounded-lg border border-red-200 bg-red-50">
+        <p className="text-red-800">{error}</p>
       </div>
     );
   }
 
   if (!videoUrl) {
     return (
-      <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
-        <p className="text-zinc-600 dark:text-zinc-400">No video available</p>
+      <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-slate-100">
+        <p className="text-slate-600">No video available</p>
       </div>
     );
   }

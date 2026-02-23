@@ -25,22 +25,22 @@ export default async function StoryPage({
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black">
+    <div className="min-h-screen">
       <main className="mx-auto w-full max-w-3xl p-8">
         <Link
           href="/"
-          className="inline-flex items-center text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+          className="inline-flex items-center text-sm text-teal-500 hover:text-teal-600"
         >
           ← Back to Stories
         </Link>
 
-        <div className="mt-6 rounded-lg border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
-          <h1 className="text-4xl font-semibold text-zinc-900 dark:text-zinc-50">
+        <div className="mt-6 rounded-lg border border-slate-200 bg-white p-8">
+          <h1 className="text-4xl font-semibold text-blue-950">
             {story.title}
           </h1>
 
-          <div className="mt-4 flex items-center gap-4 text-sm text-zinc-600 dark:text-zinc-400">
-            <span className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1 dark:bg-zinc-800">
+          <div className="mt-4 flex items-center gap-4 text-sm text-slate-600">
+            <span className="inline-flex items-center rounded-full bg-teal-50 px-3 py-1 text-teal-700">
               {story.reader === 'granny' ? '👵 Granny' : '👴 Grandpa'}
             </span>
             <span>
@@ -55,7 +55,7 @@ export default async function StoryPage({
           </div>
 
           <div className="mt-8">
-            <h2 className="mb-4 text-lg font-medium text-zinc-900 dark:text-zinc-50">
+            <h2 className="mb-4 text-lg font-medium text-blue-950">
               Video
             </h2>
             <VideoPlayer storyId={id} />
