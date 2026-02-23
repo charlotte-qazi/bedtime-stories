@@ -1,6 +1,7 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/browser';
+import { createStoryRecord } from '@/lib/actions/upload';
+import { getUploadUrl, uploadToR2 } from '@/lib/api/upload';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, type FormEvent } from 'react';
 import Link from 'next/link';
@@ -34,67 +35,23 @@ export default function UploadForm() {
         throw new Error('Please select a video file');
       }
 
-      // Step 1: Get upload URL
       setProgress('Getting upload URL...');
-      const uploadUrlResponse = await fetch('/api/upload-url', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          filename: file.name,
-          contentType: file.type,
-        }),
-      });
+      const { key, url } = await getUploadUrl(file.name, file.type);
 
-      if (!uploadUrlResponse.ok) {
-        const data = await uploadUrlResponse.json();
-        throw new Error(data.error || 'Failed to get upload URL');
-      }
-
-      const { key, url } = await uploadUrlResponse.json();
-
-      // Step 2: Upload file to R2
       setProgress('Uploading video...');
-      try {
-        const uploadResponse = await fetch(url, {
-          method: 'PUT',
-          body: file,
-          headers: {
-            'Content-Type': file.type,
-          },
-        });
+      await uploadToR2(url, file);
 
-        if (!uploadResponse.ok) {
-          throw new Error(
-            `Failed to upload video: ${uploadResponse.status} ${uploadResponse.statusText}`
-          );
-        }
-      } catch (uploadError) {
-        if (uploadError instanceof TypeError && uploadError.message === 'Failed to fetch') {
-          throw new Error(
-            'CORS error: R2 bucket needs CORS configuration. Check R2_SETUP.md for instructions.'
-          );
-        }
-        throw uploadError;
-      }
-
-      // Step 3: Create story in database
       setProgress('Creating story record...');
-      const supabase = createClient();
-      const { error: dbError } = await supabase.from('stories').insert({
-        title,
-        reader,
-        video_object_key: key,
-      });
+      const result = await createStoryRecord(title, reader, key);
 
-      if (dbError) {
-        throw new Error(dbError.message || 'Failed to create story');
+      if (result.error) {
+        throw new Error(result.error);
       }
 
       setProgress('Complete!');
       setSuccess(true);
       setUploading(false);
 
-      // Reset form
       if (formRef.current) {
         formRef.current.reset();
       }

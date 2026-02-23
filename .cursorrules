@@ -1,53 +1,50 @@
-# Bedtime Stories - Project Rules & Patterns
+# Bedtime Stories - Cursor AI Rules
 
-This document defines the patterns, conventions, and architecture rules for the Bedtime Stories project. Follow these guidelines to maintain consistency across the codebase.
+Follow these patterns for consistency. See `V0_INTEGRATION.md` for UI redesign workflow.
 
-## 🏗️ Project Architecture
+## 🏗️ Architecture
 
 ### Tech Stack
-- **Framework**: Next.js 16.1.6 (App Router)
-- **Runtime**: React 19.2.3
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS v4
-- **Authentication**: Supabase Auth with @supabase/ssr v0.8.0
-- **Package Manager**: pnpm
+- Next.js 16.1.6 App Router + TypeScript
+- Tailwind CSS v4 (default palette only)
+- Supabase Auth (@supabase/ssr)
+- Cloudflare R2 (AWS SDK v3)
 
-### Directory Structure
+### Structure
 ```
 src/
-├── app/               # Next.js App Router pages
-│   ├── page.tsx      # Protected routes (server components)
-│   ├── login/        # Auth pages (client components)
-│   ├── signup/
-│   └── layout.tsx    # Root layout
+├── app/              # Pages (orchestration only)
+├── components/       # UI only (no DB/API calls)
 ├── lib/
-│   ├── auth.ts       # Authentication helpers
-│   └── supabase/     # Supabase client utilities
-│       ├── browser.ts
-│       └── server.ts
+│   ├── actions/      # Server Actions (mutations)
+│   ├── api/          # API client utilities
+│   ├── queries/      # Database reads
+│   └── supabase/     # Client helpers
 ```
 
-## 🔐 Authentication Patterns
+### Separation of Concerns
+- **Pages**: Fetch data → Pass to components
+- **Components**: Render UI only (data from props)
+- **lib/actions**: Mutations (create, update, delete)
+- **lib/queries**: Database reads
+- **lib/api**: Client-side API calls
 
-### Core Principle
-**No Middleware**: Authentication checks happen at the page/route level, not in middleware. This avoids Edge Runtime fetch issues in Next.js 16.
+## 🔐 Authentication
 
-### Protected Server Components (Pages)
+**No Middleware** - Auth checks at page/route level (avoids Edge Runtime issues).
+
+### Protected Pages
 ```typescript
 import { requireAuth } from '@/lib/auth';
+import { getStories } from '@/lib/queries/stories';
+import StoriesList from '@/components/StoriesList';
 
-export default async function ProtectedPage() {
-  const user = await requireAuth(); // One line - DRY!
-  
-  return <div>Welcome, {user.email}!</div>;
+export default async function Home() {
+  const user = await requireAuth();
+  const { stories } = await getStories();
+  return <StoriesList stories={stories} userEmail={user.email} />;
 }
 ```
-
-**Rules:**
-- ✅ Always use `requireAuth()` for protected pages
-- ✅ Keep it simple - one line at the top of the component
-- ❌ Never manually create Supabase client in page components
-- ❌ Never use try-catch for auth - `requireAuth()` handles it
 
 ### Protected API Routes
 ```typescript
@@ -55,381 +52,182 @@ import { requireAuthAPI } from '@/lib/auth';
 
 export async function GET() {
   const { error, user } = await requireAuthAPI();
-  if (error) return error; // Early return if not authenticated
-  
-  // Your protected API logic here
-  return Response.json({ data: 'protected', userId: user.id });
+  if (error) return error;
+  // ... protected logic
 }
 ```
 
-**Rules:**
-- ✅ Always check auth first with `requireAuthAPI()`
-- ✅ Return early if `error` exists
-- ✅ Use `user.id` for user-specific operations
-- ❌ Never proceed with logic if `error` is present
+### Auth Forms (Login/Signup)
+Page wrappers must be client components to pass functions:
 
-### Client-Side Auth (Login/Signup)
 ```typescript
+// app/login/page.tsx
 'use client';
 
-import { createClient } from '@/lib/supabase/browser';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { login } from '@/lib/actions/auth';
+import LoginForm from '@/components/LoginForm';
 
-export default function AuthPage() {
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    } else {
-      router.push('/');
-      router.refresh();
-    }
+export default function LoginPage() {
+  async function handleLogin(email: string, password: string) {
+    const result = await login(email, password);
+    if (result?.error) throw new Error(result.error);
   }
-  
-  // Form JSX...
+  return <LoginForm onSubmit={handleLogin} />;
 }
 ```
 
-**Rules:**
-- ✅ Use `'use client'` directive for auth pages
-- ✅ Use `createClient()` from `@/lib/supabase/browser`
-- ✅ Always manage `error` and `loading` states
-- ✅ Use `FormData` to extract form values
-- ✅ Call `router.refresh()` after successful auth
-- ❌ Never use server client in client components
+### ❌ NEVER Use Supabase Clients Directly
 
-### Supabase Client Usage
+**Only allowed in:**
+- `lib/actions/*`, `lib/queries/*`, `lib/auth.ts`
 
-**Browser Client** (`@/lib/supabase/browser`):
-- Use in: Client components, form handlers
-- Never use in: Server components, API routes
+**Never in:**
+- `components/*` (use props/callbacks)
+- `app/*` pages (use query functions/actions)
 
-**Server Client** (`@/lib/supabase/server`):
-- Use in: Server components, API routes
-- Never use in: Client components
-- Access via: `requireAuth()` or `requireAuthAPI()` helpers
+## 🎨 Styling
 
-**Direct client usage:**
-❌ Don't create clients manually in pages/routes
-✅ Always use the provided helpers (`requireAuth`, `requireAuthAPI`)
+### Ocean Theme (Default Tailwind Only)
+- Background: `bg-slate-50`
+- Headings: `text-blue-950`
+- Buttons: `bg-blue-950 hover:bg-blue-900 text-white`
+- Links: `text-teal-500`
+- Badges: `bg-teal-50 text-teal-700`
+- Success: `bg-emerald-50 text-emerald-800`
+- Error: `bg-red-50 text-red-800`
+- Cards: `bg-white border-slate-200`
 
-### Session Configuration
-- **Storage**: HTTP-only cookies via `@supabase/ssr`
-- **Persistence**: Automatic across browser restarts
-- **Per-device**: Each device/browser maintains separate sessions
+### Rules
+- ✅ Default Tailwind palette only (no custom colors)
+- ✅ No dark mode (MVP simplified)
+- ✅ Ocean theme throughout (blue-950, teal-500, slate)
+- ✅ Include `transition-colors` on interactive elements
+- ❌ Never extend tailwind config
 
-## 🎨 Styling Patterns
+## 📝 TypeScript
 
-### Tailwind CSS Conventions
-- **Color Palette**: Zinc scale (`zinc-50`, `zinc-900`, etc.)
-- **Dark Mode**: Always include dark mode variants
-- **Pattern**: `light-classes dark:dark-classes`
-
-### Common Component Styles
-
-**Full-height centered container:**
-```tsx
-<div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
-```
-
-**Card/Form container:**
-```tsx
-<div className="w-full max-w-md rounded-lg border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
-```
-
-**Headings:**
-```tsx
-<h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
-```
-
-**Body text:**
-```tsx
-<p className="text-zinc-600 dark:text-zinc-400">
-```
-
-**Form inputs:**
-```tsx
-<input
-  className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
-/>
-```
-
-**Primary buttons:**
-```tsx
-<button
-  className="w-full rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
->
-```
-
-**Error messages:**
-```tsx
-<div className="rounded-md bg-red-50 p-3 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-400">
-```
-
-**Success messages:**
-```tsx
-<div className="rounded-md bg-green-50 p-4 text-sm text-green-800 dark:bg-green-900/20 dark:text-green-400">
-```
-
-**Links:**
-```tsx
-<Link
-  href="/path"
-  className="font-medium text-zinc-900 hover:underline dark:text-zinc-50"
->
-```
-
-### Style Rules
-- ✅ Always provide dark mode variants for colors
-- ✅ Use `zinc` scale for neutral colors
-- ✅ Use semantic spacing (`space-y-4`, `gap-6`)
-- ✅ Include `transition-colors` for interactive elements
-- ✅ Show disabled states with `disabled:opacity-50`
-- ❌ Never use arbitrary values like `[#383838]` - prefer Tailwind tokens
-- ❌ Don't use custom CSS - stay within Tailwind utilities
-
-## 📝 TypeScript Patterns
-
-### Type Imports
-```typescript
-import type { FormEvent } from 'react';
-import type { Metadata } from 'next';
-```
-
-**Rules:**
-- ✅ Use `type` keyword for type-only imports
-- ✅ Keep type imports separate from value imports
-
-### Component Props & Shared Types
-```typescript
-// Use shared types from src/lib/types.ts
-import type { Story } from '@/lib/types';
-
-export default function Component({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  // ...
-}
-```
-
-**Rules:**
-- ✅ Use shared types from `@/lib/types` for domain models (Story, etc.)
-- ✅ Use `Readonly<>` for props that shouldn't be mutated
-- ✅ Explicitly type props inline for simple components
-- ✅ Extract complex props to separate interfaces
-
-### Async Functions
-```typescript
-async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-  e.preventDefault();
-  // ...
-}
-```
-
-**Rules:**
-- ✅ Always type event parameters (`FormEvent<HTMLFormElement>`)
-- ✅ Call `preventDefault()` for form handlers
+- Use `type` keyword for type-only imports
+- Import shared types from `@/lib/types`
+- Type all event handlers: `FormEvent<HTMLFormElement>`
+- Use `Readonly<>` for props when appropriate
 
 ## 🔧 Environment Variables
 
-### Naming Convention
+Required in `.env.local`:
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_xxx
+R2_ACCOUNT_ID=xxx
+R2_ACCESS_KEY_ID=xxx
+R2_SECRET_ACCESS_KEY=xxx
+R2_BUCKET=bedtime-stories
 ```
 
-**Rules:**
-- ✅ Use `NEXT_PUBLIC_` prefix for client-accessible vars
-- ✅ Use JWT format for `SUPABASE_ANON_KEY` (starts with `eyJ`)
-- ❌ Never commit `.env.local` to git
-- ❌ Never use `NODE_TLS_REJECT_UNAUTHORIZED=0` in production
+- Use `sb_publishable_*` format (not legacy `eyJ...`)
+- Never commit `.env.local`
+- Never use `NODE_TLS_REJECT_UNAUTHORIZED=0` (turn off Zscaler)
 
-### Accessing Environment Variables
-```typescript
-process.env.NEXT_PUBLIC_SUPABASE_URL!
-```
+## 📦 Imports
 
-**Rules:**
-- ✅ Use non-null assertion (`!`) for required env vars
-- ✅ Access via `process.env` only
+- Always use `@/` alias for src imports
+- Import order: Next/React → Third-party → Local utils → Components → Types
 
-## 🧩 Component Patterns
+## 🚫 Anti-Patterns
 
-### Server Components (Default)
-```typescript
-export default async function ServerPage() {
-  const user = await requireAuth();
-  const data = await fetchData(); // Can do server-side fetching
-  
-  return <div>...</div>;
-}
-```
+### ❌ No Middleware
+- Causes Edge Runtime fetch issues in Next.js 16
 
-**Use for:**
-- Pages that fetch data
-- Protected routes
-- SEO-important pages
-
-### Client Components
-```typescript
-'use client';
-
-import { useState } from 'react';
-
-export default function ClientPage() {
-  const [state, setState] = useState(false);
-  
-  return <div>...</div>;
-}
-```
-
-**Use for:**
-- Forms with interactivity
-- Pages using hooks (`useState`, `useEffect`, etc.)
-- Auth pages (login, signup)
-
-**Rules:**
-- ✅ Add `'use client'` at the very top
-- ✅ Keep client components minimal
-- ✅ Prefer server components when possible
-
-## 📦 Import Patterns
-
-### Path Aliases
-```typescript
-import { requireAuth } from '@/lib/auth';
-import { createClient } from '@/lib/supabase/browser';
-```
-
-**Rules:**
-- ✅ Always use `@/` alias for src imports
-- ✅ Use relative imports only for co-located files
-- ❌ Never use `../../../` style imports across directories
-
-### Import Order
-1. React/Next.js imports
-2. Third-party libraries
-3. Local utilities (`@/lib`)
-4. Local components (`@/components`)
-5. Types
-
-```typescript
-import { redirect } from 'next/navigation';
-import { useState } from 'react';
-import { requireAuth } from '@/lib/auth';
-import type { User } from '@supabase/supabase-js';
-```
-
-## 🚫 Anti-Patterns (What NOT to Do)
-
-### ❌ Don't Use Middleware
-- No `middleware.ts` file - causes Edge Runtime fetch issues
-- Auth checks happen at page/route level instead
-
-### ❌ Don't Create Supabase Clients Directly
+### ❌ No Business Logic in Components
 ```typescript
 // ❌ BAD
-const supabase = createServerClient(...)
+const supabase = createClient(); // In component
 
 // ✅ GOOD
-const user = await requireAuth();
+interface Props { stories: Story[] }
+export default function MyComponent({ stories }: Props) { ... }
 ```
 
-### ❌ Don't Mix Client/Server Code
+### ❌ No Direct Database Queries in Pages
 ```typescript
-// ❌ BAD - Using browser client in server component
-import { createClient } from '@/lib/supabase/browser';
+// ❌ BAD
+const { data } = await supabase.from('stories').select('*');
+
+// ✅ GOOD
+const { stories } = await getStories();
+```
+
+## ✅ Principles
+
+### DRY
+- Use helpers: `requireAuth()`, `getStories()`, etc.
+- No repeated auth checks or queries
+
+### Separation
+- Pages: Orchestrate (fetch → pass props)
+- Components: UI only (no fetching/DB)
+- lib/: All business logic
+
+### Security
+- `requireAuth()` for protected pages
+- `requireAuthAPI()` for API routes
+- Validate inputs in API routes
+- RLS enabled in Supabase
+
+### Performance
+- Server components for data fetching
+- Minimize client JS
+
+## 📚 Key Files
+
+### Business Logic
+- `lib/auth.ts` - requireAuth(), requireAuthAPI()
+- `lib/actions/` - Server actions (login, signup, createStoryRecord)
+- `lib/queries/` - DB reads (getStories, getStoryById)
+- `lib/api/` - API utils (getVideoUrl, getUploadUrl, uploadToR2)
+- `lib/r2.ts` - R2 signed URLs
+- `lib/types.ts` - Shared types
+
+### UI (components/)
+- Pure presentational components
+- LoginForm, SignupForm, StoriesList, StoryDetail, VideoPlayer
+
+### Pages (app/)
+- Orchestrators (fetch → render component)
+- No business logic
+
+### API Routes (app/api/)
+- `upload-url/route.ts` - R2 upload URL
+- `video-url/route.ts` - R2 video URL
+
+## 🎯 Quick Patterns
+
+### Add Protected Page
+```typescript
+// app/new-page/page.tsx
+import { requireAuth } from '@/lib/auth';
+import { getData } from '@/lib/queries/data';
+import MyComponent from '@/components/MyComponent';
 
 export default async function Page() {
-  const supabase = createClient(); // Wrong!
+  await requireAuth();
+  const { data } = await getData();
+  return <MyComponent data={data} />;
 }
 ```
 
-### ❌ Don't Duplicate Auth Logic
-```typescript
-// ❌ BAD - Manual auth check
-const { data: { user } } = await supabase.auth.getUser();
-if (!user) redirect('/login');
+### Add Form
+1. Server action in `lib/actions/`
+2. UI component in `components/` (receive onSubmit prop)
+3. Page wrapper passes action as callback
 
-// ✅ GOOD - Use helper
-const user = await requireAuth();
-```
+### Redesign with v0
+Read `V0_INTEGRATION.md` → Keep props interface → Replace component
 
-## ✅ Code Quality Rules
+## 📌 Core Rules
 
-### DRY (Don't Repeat Yourself)
-- Use `requireAuth()` instead of repeating auth checks
-- Extract reusable styles to component patterns
-- Create helpers for common operations
-
-### Simplicity
-- Keep components focused and single-purpose
-- Minimize client-side JavaScript
-- Prefer server components over client components
-
-### Security
-- Never bypass SSL in production
-- Always validate user input
-- Use `requireAuth()` for all protected routes
-- Enable Row Level Security (RLS) in Supabase
-
-### Performance
-- Use server components for data fetching
-- Minimize client bundle size
-- Leverage Next.js caching
-
-## 📚 Key Files Reference
-
-### Core Libraries
-- `src/lib/auth.ts` - Auth helpers (requireAuth, requireAuthAPI)
-- `src/lib/types.ts` - Shared TypeScript interfaces
-- `src/lib/supabase/browser.ts` - Browser client creator
-- `src/lib/supabase/server.ts` - Server client creator
-- `src/lib/r2.ts` - R2 presigned URL helpers
-
-### Pages
-- `src/app/page.tsx` - Protected home page (example)
-- `src/app/login/page.tsx` - Login form
-- `src/app/signup/page.tsx` - Registration form
-
-### Configuration
-- `.env.local` - Environment variables (not in git)
-- `next.config.ts` - Next.js configuration
-- `tailwind.config.ts` - Tailwind configuration
-
-## 🎯 Development Workflow
-
-1. **Creating Protected Pages**: Use `requireAuth()`
-2. **Creating Auth Forms**: Use client components with `createClient()` from browser
-3. **Creating API Routes**: Use `requireAuthAPI()` at the start
-4. **Styling**: Follow Tailwind patterns with dark mode
-5. **Testing**: Turn off Zscaler if SSL issues occur
-
-## 📌 Remember
-
-- **Simple over complex** - Use helpers, avoid duplication
-- **Server over client** - Prefer server components
-- **Type everything** - TypeScript is your friend
-- **Dark mode always** - Every color needs a dark variant
-- **DRY principle** - One source of truth for auth logic
+- **No middleware** (Edge Runtime issues)
+- **No Supabase in components** (use actions/queries)
+- **No fetching in pages** (use query functions)
+- **Props over fetching** (pass data down)
+- **Ocean theme only** (blue-950, teal-500, slate)
+- **Server > Client** (prefer server components)

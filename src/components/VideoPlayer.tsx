@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { getVideoUrl } from '@/lib/api/video';
 
 interface VideoPlayerProps {
   storyId: string;
@@ -16,15 +17,8 @@ export default function VideoPlayer({ storyId }: VideoPlayerProps) {
       try {
         setLoading(true);
         setError(null);
-
-        const response = await fetch(`/api/video-url?storyId=${storyId}`);
-
-        if (!response.ok) {
-          throw new Error('Failed to load video');
-        }
-
-        const data = await response.json();
-        setVideoUrl(data.url);
+        const url = await getVideoUrl(storyId);
+        setVideoUrl(url);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load video');
       } finally {

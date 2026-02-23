@@ -1,9 +1,7 @@
 import { requireAuth } from '@/lib/auth';
-import { createClient } from '@/lib/supabase/server';
+import { getStoryById } from '@/lib/queries/stories';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import VideoPlayer from '@/components/VideoPlayer';
-import type { Story } from '@/lib/types';
+import StoryDetail from '@/components/StoryDetail';
 
 export default async function StoryPage({
   params,
@@ -12,56 +10,12 @@ export default async function StoryPage({
 }) {
   await requireAuth();
   const { id } = await params;
-  const supabase = await createClient();
 
-  const { data: story, error } = await supabase
-    .from('stories')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const { story, error } = await getStoryById(id);
 
   if (error || !story) {
     notFound();
   }
 
-  return (
-    <div className="min-h-screen">
-      <main className="mx-auto w-full max-w-3xl p-8">
-        <Link
-          href="/"
-          className="inline-flex items-center text-sm text-teal-500 hover:text-teal-600"
-        >
-          ← Back to Stories
-        </Link>
-
-        <div className="mt-6 rounded-lg border border-slate-200 bg-white p-8">
-          <h1 className="text-4xl font-semibold text-blue-950">
-            {story.title}
-          </h1>
-
-          <div className="mt-4 flex items-center gap-4 text-sm text-slate-600">
-            <span className="inline-flex items-center rounded-full bg-teal-50 px-3 py-1 text-teal-700">
-              {story.reader === 'granny' ? '👵 Granny' : '👴 Grandpa'}
-            </span>
-            <span>
-              {new Date(story.created_at).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </span>
-          </div>
-
-          <div className="mt-8">
-            <h2 className="mb-4 text-lg font-medium text-blue-950">
-              Video
-            </h2>
-            <VideoPlayer storyId={id} />
-          </div>
-        </div>
-      </main>
-    </div>
-  );
+  return <StoryDetail story={story} />;
 }
