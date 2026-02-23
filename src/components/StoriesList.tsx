@@ -20,7 +20,7 @@ export default function StoriesList({
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero section with ocean illustration */}
-      <div className="relative min-h-[420px] overflow-hidden bg-blue-950 sm:min-h-[460px]">
+      <div className="relative min-h-[420px] overflow-hidden bg-blue-950 sm:min-h-[460px] lg:min-h-[520px] xl:min-h-[560px]">
         <div className="absolute inset-0">
           <Image
             src="/images/ocean-hero.jpg"
