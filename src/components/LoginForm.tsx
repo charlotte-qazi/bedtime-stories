@@ -2,6 +2,8 @@
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
 
 interface LoginFormProps {
   onSubmit: (email: string, password: string) => Promise<void>;
@@ -40,50 +42,28 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
           </h1>
         </div>
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-semibold text-slate-700"
-            >
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              className="mt-2 block w-full rounded-2xl border-2 border-slate-200 px-4 py-3.5 text-base text-slate-900 placeholder-slate-400 transition-colors focus:border-teal-500 focus:outline-none focus:ring-0"
-              placeholder="you@example.com"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-semibold text-slate-700"
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              className="mt-2 block w-full rounded-2xl border-2 border-slate-200 px-4 py-3.5 text-base text-slate-900 placeholder-slate-400 transition-colors focus:border-teal-500 focus:outline-none focus:ring-0"
-              placeholder="••••••••"
-            />
-          </div>
+          <Input
+            label="Email"
+            name="email"
+            type="email"
+            required
+            placeholder="you@example.com"
+          />
+          <Input
+            label="Password"
+            name="password"
+            type="password"
+            required
+            placeholder="••••••••"
+          />
           {error && (
             <div className="rounded-2xl bg-red-50 px-4 py-3.5 text-sm font-medium leading-relaxed text-red-800">
               {error}
             </div>
           )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-2xl bg-teal-500 px-6 py-3.5 text-base font-bold text-white transition-colors hover:bg-teal-400 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2"
-          >
+          <Button type="submit" disabled={loading} className="w-full">
             {loading ? 'Signing in...' : 'Sign In'}
-          </button>
+          </Button>
         </form>
         <p className="mt-6 text-center text-sm text-slate-500">
           Don&apos;t have an account?{' '}

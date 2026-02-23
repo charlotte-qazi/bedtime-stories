@@ -1,4 +1,5 @@
-import Link from 'next/link';
+import BackLink from '@/components/ui/BackLink';
+import ContentCard from '@/components/ui/ContentCard';
 import VideoPlayer from '@/components/VideoPlayer';
 import type { Story } from '@/lib/types';
 
@@ -14,19 +15,9 @@ export default function StoryDetail({ story }: StoryDetailProps) {
   return (
     <div className="min-h-screen bg-slate-50">
       <main className="mx-auto w-full max-w-4xl px-5 py-8 sm:px-8 sm:py-12">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-teal-600 transition-colors hover:text-teal-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
-        >
-          ← Back to Stories
-        </Link>
+        <BackLink />
 
-        <div className="relative mt-8 overflow-hidden rounded-3xl bg-white p-6 shadow-sm sm:p-10">
-          <div
-            className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-teal-400 via-teal-500 to-blue-500"
-            aria-hidden="true"
-          />
-
+        <ContentCard className="mt-8">
           <div className="mb-10 mt-2">
             <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">
               Across the Seas
@@ -51,7 +42,7 @@ export default function StoryDetail({ story }: StoryDetailProps) {
           </div>
 
           <VideoPlayer storyId={story.id} />
-        </div>
+        </ContentCard>
       </main>
     </div>
   );

@@ -5,6 +5,8 @@ import { getUploadUrl, uploadToR2 } from '@/lib/api/upload';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, type FormEvent } from 'react';
 import Link from 'next/link';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
 
 export default function UploadForm() {
   const router = useRouter();
@@ -85,23 +87,14 @@ export default function UploadForm() {
       )}
 
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label
-            htmlFor="title"
-            className="block text-sm font-semibold text-slate-700"
-          >
-            Story Title
-          </label>
-          <input
-            id="title"
-            name="title"
-            type="text"
-            required
-            disabled={uploading}
-            className="mt-2 block w-full rounded-2xl border-2 border-slate-200 px-4 py-3.5 text-base text-slate-900 placeholder-slate-400 transition-colors focus:border-teal-500 focus:outline-none focus:ring-0 disabled:opacity-50"
-            placeholder="The Magical Forest"
-          />
-        </div>
+        <Input
+          label="Story Title"
+          name="title"
+          type="text"
+          required
+          disabled={uploading}
+          placeholder="The Magical Forest"
+        />
 
         <div>
           <label
@@ -151,13 +144,9 @@ export default function UploadForm() {
         )}
 
         <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-          <button
-            type="submit"
-            disabled={uploading}
-            className="flex-1 rounded-2xl bg-teal-500 px-6 py-3.5 text-base font-bold text-white transition-colors hover:bg-teal-400 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2"
-          >
+          <Button type="submit" disabled={uploading} className="flex-1">
             {uploading ? 'Uploading...' : 'Upload Story'}
-          </button>
+          </Button>
           <Link
             href="/"
             className="inline-flex items-center justify-center rounded-2xl border-2 border-slate-200 px-6 py-3.5 text-base font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
