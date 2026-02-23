@@ -26,7 +26,7 @@ export default function StoriesList({
             src="/images/ocean-hero.jpg"
             alt=""
             fill
-            className="object-cover opacity-40"
+            className="object-cover object-center lg:object-bottom opacity-40"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-b from-blue-950/50 via-transparent to-blue-950/70" />
