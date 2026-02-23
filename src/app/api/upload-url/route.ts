@@ -1,19 +1,32 @@
 import { requireAuthAPI } from '@/lib/auth';
 import { signPutObjectUrl } from '@/lib/r2';
 
-function sanitizeFilename(filename: string): string {
-  return filename
+function slugify(text: string): string {
+  return text
     .toLowerCase()
     .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9.-]/g, '');
+    .replace(/[^a-z0-9-]/g, '');
 }
 
-function generateObjectKey(filename: string): string {
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  const randomId = crypto.randomUUID().split('-')[0]; // First segment of UUID
-  const sanitized = sanitizeFilename(filename);
-  
-  return `videos/${today}/${randomId}-${sanitized}`;
+function generateShortId(length: number = 6): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result;
+}
+
+function generateObjectKey(
+  reader: 'granny' | 'grandpa',
+  title: string
+): string {
+  const now = new Date();
+  const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const slug = slugify(title);
+  const shortId = generateShortId(6);
+
+  return `videos/${reader}/${yearMonth}/${slug}-${shortId}.mp4`;
 }
 
 export async function POST(request: Request) {
@@ -27,10 +40,17 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const { filename, contentType } = body;
+  const { reader, title, contentType } = body;
 
-  if (!filename || typeof filename !== 'string') {
-    return Response.json({ error: 'Missing or invalid filename' }, { status: 400 });
+  if (!reader || (reader !== 'granny' && reader !== 'grandpa')) {
+    return Response.json(
+      { error: 'reader must be "granny" or "grandpa"' },
+      { status: 400 }
+    );
+  }
+
+  if (!title || typeof title !== 'string' || title.trim().length === 0) {
+    return Response.json({ error: 'Missing or invalid title' }, { status: 400 });
   }
 
   if (!contentType || typeof contentType !== 'string') {
@@ -38,10 +58,13 @@ export async function POST(request: Request) {
   }
 
   if (!contentType.startsWith('video/')) {
-    return Response.json({ error: 'contentType must start with "video/"' }, { status: 400 });
+    return Response.json(
+      { error: 'contentType must start with "video/"' },
+      { status: 400 }
+    );
   }
 
-  const key = generateObjectKey(filename);
+  const key = generateObjectKey(reader, title);
   const url = await signPutObjectUrl(key, contentType);
 
   return Response.json({ key, url });

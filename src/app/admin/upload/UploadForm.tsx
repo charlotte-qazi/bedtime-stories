@@ -36,7 +36,7 @@ export default function UploadForm() {
       }
 
       setProgress('Getting upload URL...');
-      const { key, url } = await getUploadUrl(file.name, file.type);
+      const { key, url } = await getUploadUrl(reader, title, file.type);
 
       setProgress('Uploading video...');
       await uploadToR2(url, file);

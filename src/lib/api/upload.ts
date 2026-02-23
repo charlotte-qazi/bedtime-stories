@@ -1,8 +1,12 @@
-export async function getUploadUrl(filename: string, contentType: string) {
+export async function getUploadUrl(
+  reader: 'granny' | 'grandpa',
+  title: string,
+  contentType: string
+) {
   const response = await fetch('/api/upload-url', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ filename, contentType }),
+    body: JSON.stringify({ reader, title, contentType }),
   });
 
   if (!response.ok) {
