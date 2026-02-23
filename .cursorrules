@@ -85,23 +85,89 @@ export default function LoginPage() {
 - `components/*` (use props/callbacks)
 - `app/*` pages (use query functions/actions)
 
-## 🎨 Styling
+## 🎨 Design System
 
-### Ocean Theme (Default Tailwind Only)
+### Ocean Theme - Calm & Warm
+**Tone:** Calm, gentle, ocean-inspired, toddler-friendly (not childish), emotionally reassuring
+
+**Colors (Default Tailwind only):**
 - Background: `bg-slate-50`
-- Headings: `text-blue-950`
-- Buttons: `bg-blue-950 hover:bg-blue-900 text-white`
-- Links: `text-teal-500`
-- Badges: `bg-teal-50 text-teal-700`
+- Headings: `text-blue-950` with `font-extrabold tracking-tight`
+- Primary buttons: `bg-teal-500 hover:bg-teal-400 text-white font-bold`
+- Links: `text-teal-600 hover:text-teal-500`
+- Badges: `bg-teal-50 text-teal-700 font-semibold`
 - Success: `bg-emerald-50 text-emerald-800`
 - Error: `bg-red-50 text-red-800`
-- Cards: `bg-white border-slate-200`
+- Cards: `bg-white shadow-sm`
+- Accents: teal-300, teal-400, teal-500
+
+**Rounded Corners:**
+- Cards/containers: `rounded-3xl`
+- Buttons/inputs: `rounded-2xl`
+- Badges: `rounded-full`
+- Video player: `rounded-2xl`
+
+**Spacing:**
+- Generous padding: `p-6 sm:p-10` for cards
+- Large tap targets: `py-3.5 px-6` for buttons
+- Breathable gaps: `gap-6`, `space-y-6`
+
+**Typography:**
+- Headings: `font-extrabold text-3xl sm:text-4xl tracking-tight`
+- Body: `text-base leading-relaxed`
+- Labels: `font-semibold text-sm`
+- Use `text-pretty` or `text-balance` for headings
+
+**Interactive States:**
+- Hover: `transition-colors` or `transition-all`, subtle scale: `hover:scale-[1.02]`
+- Focus: `focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2`
+- Disabled: `disabled:opacity-50`
+- Shadows: `shadow-sm hover:shadow-lg`
+
+**Form Inputs:**
+- Border: `border-2 border-slate-200`
+- Focus: `focus:border-teal-500 focus:ring-0`
+- Size: `px-4 py-3.5 text-base`
+
+**Visual Identity Elements:**
+- **Gradient Accent:** Add to all major cards
+  ```tsx
+  <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-teal-400 via-teal-500 to-blue-500" />
+  ```
+  Use on: StoryCard, upload form, story detail, etc.
+
+- **Page Header Hierarchy:** Use on all pages except home
+  ```tsx
+  <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">
+    Across the Seas
+  </p>
+  <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-blue-950 sm:text-4xl">
+    Page Title
+  </h1>
+  <p className="mt-3 text-base leading-relaxed text-slate-500">
+    Subtitle or description
+  </p>
+  ```
+
+- **Back Link:** Consistent placement and style
+  ```tsx
+  <Link
+    href="/"
+    className="inline-flex items-center gap-2 text-sm font-semibold text-teal-600 transition-colors hover:text-teal-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+  >
+    ← Back to Stories
+  </Link>
+  ```
+
+**Reusable Components:**
+- `StoryCard` - Standard card with gradient, badge, title, date
 
 ### Rules
-- ✅ Default Tailwind palette only (no custom colors)
-- ✅ No dark mode (MVP simplified)
-- ✅ Ocean theme throughout (blue-950, teal-500, slate)
-- ✅ Include `transition-colors` on interactive elements
+- ✅ Default Tailwind palette only
+- ✅ No dark mode
+- ✅ Mobile-first, large tap targets
+- ✅ Calm, breathable spacing
+- ❌ No bright primary colors, no hard shadows
 - ❌ Never extend tailwind config
 
 ## 📝 TypeScript
@@ -188,8 +254,11 @@ const { stories } = await getStories();
 - `lib/types.ts` - Shared types
 
 ### UI (components/)
-- Pure presentational components
-- LoginForm, SignupForm, StoriesList, StoryDetail, VideoPlayer
+Pure presentational components:
+- `StoryCard` - Reusable card (gradient top, badge, title, date)
+- `LoginForm`, `SignupForm` - Auth forms
+- `StoriesList`, `StoryDetail` - Story views
+- `VideoPlayer` - Video display
 
 ### Pages (app/)
 - Orchestrators (fetch → render component)

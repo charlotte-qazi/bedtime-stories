@@ -31,24 +31,24 @@ export default function VideoPlayer({ storyId }: VideoPlayerProps) {
 
   if (loading) {
     return (
-      <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-slate-100">
-        <p className="text-slate-600">Loading video...</p>
+      <div className="flex aspect-video w-full items-center justify-center rounded-2xl bg-slate-100">
+        <p className="text-base font-medium text-slate-500">Loading video...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex aspect-video w-full items-center justify-center rounded-lg border border-red-200 bg-red-50">
-        <p className="text-red-800">{error}</p>
+      <div className="flex aspect-video w-full items-center justify-center rounded-2xl bg-red-50">
+        <p className="text-base font-medium text-red-800">{error}</p>
       </div>
     );
   }
 
   if (!videoUrl) {
     return (
-      <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-slate-100">
-        <p className="text-slate-600">No video available</p>
+      <div className="flex aspect-video w-full items-center justify-center rounded-2xl bg-slate-100">
+        <p className="text-base font-medium text-slate-500">No video available</p>
       </div>
     );
   }
@@ -57,8 +57,7 @@ export default function VideoPlayer({ storyId }: VideoPlayerProps) {
     <video
       controls
       playsInline
-      style={{ width: '100%', maxWidth: 720 }}
-      className="rounded-lg"
+      className="w-full max-w-3xl rounded-2xl shadow-sm"
       src={videoUrl}
     />
   );
