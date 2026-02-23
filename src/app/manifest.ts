@@ -4,10 +4,18 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Across the Seas Stories',
     short_name: 'Seas Stories',
-    description: 'Voice-recorded stories that keep families close across distance.',
+    description:
+      'Bedtime stories that keep families close, no matter the distance. Voice-recorded tales from the people who love your little ones most.',
     start_url: '/',
     display: 'standalone',
-    theme_color: '#0B2A4A',
-    background_color: '#FFFFFF',
+    theme_color: '#172554',
+    background_color: '#f8fafc',
+    icons: [
+      {
+        src: '/images/icon-512.jpg',
+        sizes: '512x512',
+        type: 'image/jpeg',
+      },
+    ],
   };
 }
